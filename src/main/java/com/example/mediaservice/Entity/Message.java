@@ -1,12 +1,12 @@
 package com.example.mediaservice.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -17,15 +17,12 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @DynamicInsert
 @DynamicUpdate
-public class Symptoms {
+public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    private String content;  // Nội dung tin nhắn triệu chứng
 
-    @ManyToMany(mappedBy = "symptoms")
-    @JsonIgnore
-    private List<Diseases> diseases;
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -16,19 +17,15 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @DynamicInsert
 @DynamicUpdate
-public class Diseases {
+public class DiagnosisSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String name;
+    private String userIdentifier;
 
-    @ManyToMany
-    @JoinTable(
-            name = "disease_symptoms",
-            joinColumns = @JoinColumn(name = "disease_id"),
-            inverseJoinColumns = @JoinColumn(name = "symptom_id")
-    )
-    private List<Symptoms> symptoms;
+    @OneToMany(mappedBy = "diagnosisSession", cascade = CascadeType.ALL)
+    private List<DiagnosisQuestion> questions;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
 }

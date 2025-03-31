@@ -1,10 +1,6 @@
 package com.example.mediaservice.Service;
 
-import com.example.mediaservice.Dto.Response.DiseasesResponse;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import com.example.mediaservice.Entity.QuestionAnswer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -24,28 +20,39 @@ public class GeminiService {
         this.webClient = webClientBuilder.baseUrl(GEMINI_API_URL).build();
     }
 
-    public String getNextSymptomQuestion(String sessionId, List<DiseasesResponse> possibleDiseases) {
-        String diseaseNames = possibleDiseases.stream()
-                .map(DiseasesResponse::getName)
-                .reduce((a, b) -> a + ", " + b)
-                .orElse("");
 
-        String prompt = "Dựa trên các bệnh có thể mắc: " + diseaseNames +
-                ", hãy đặt một câu hỏi để xác định bệnh chính xác hơn.Không đặt lại câu hỏi về các triệu chứng đã có. Chỉ hỏi về các triệu chứng chưa có để thu hẹp chẩn đoán";
+
+    public String getNextSymptomQuestion(String sessionId, List<QuestionAnswer> previousQuestionsAndAnswers) {
+        StringBuilder prompt = new StringBuilder("Dựa trên các câu hỏi và câu trả lời trước đó, hãy đặt một câu hỏi mới để thu hẹp chẩn đoán.\n");
+
+        // Xây dựng phần dữ liệu câu hỏi và câu trả lời
+        for (QuestionAnswer qa : previousQuestionsAndAnswers) {
+            prompt.append("Câu hỏi: ").append(qa.getQuestion()).append("\n");
+            prompt.append("Câu trả lời: ").append(qa.getAnswer()).append("\n");
+        }
+
+        prompt.append("Hãy tạo câu hỏi tiếp theo để xác định bệnh chính xác hơn.");
 
         Map<String, Object> requestBody = Map.of(
-                "contents", new Object[]{
-                        Map.of("parts", new Object[]{
-                                Map.of("text", prompt)
+                "contents", new Object[] {
+                        Map.of("parts", new Object[] {
+                                Map.of("text", prompt.toString())
                         })
                 }
         );
 
-        return webClient.post()
+        // Gọi API và nhận câu hỏi từ Gemini
+        String response = webClient.post()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(String.class)
-                .block();
+                .block();  // Phân tích kết quả trả về từ Gemini
+
+        // Giả sử kết quả trả về là một câu hỏi, bạn cần phân tích nó để trích xuất câu hỏi thực tế
+        return extractQuestionFromResponse(response);
+    }
+    private String extractQuestionFromResponse(String response) {
+        return response.trim();  // Giả sử chỉ trả về câu hỏi duy nhất
     }
 }
