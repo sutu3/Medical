@@ -1,5 +1,6 @@
 package com.example.mediaservice.Dto.Response;
 
+import com.example.mediaservice.Entity.DiagnosisSession;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

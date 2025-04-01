@@ -1,5 +1,6 @@
-package com.example.mediaservice.Entity;
+package com.example.mediaservice.Dto.Response;
 
+import com.example.mediaservice.Entity.DiagnosisQuestion;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,23 +11,17 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@DynamicInsert
-@DynamicUpdate
-public class DiagnosisSession {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class DiagnosisSessionResponse {
     private Long id;
 
     private String userIdentifier;
 
-    @OneToMany(mappedBy = "diagnosisSession", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DiagnosisQuestion> questions = new ArrayList<>();
+    private List<DiagnosisQuestionResponse> questions ;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
 }
